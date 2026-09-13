@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCQ Mock Tests - 20 Practice Tests</title>
+<meta name="description" content="Practice with 20 full-length mock tests and 2,000 multiple-choice questions. Instant scoring, explanations, and a private result history — all in your browser.">
+
+<meta property="og:title" content="MCQ Mock Tests - 20 Practice Tests">
+<meta property="og:description" content="Practice with 20 Mock Tests • 2,000 Questions. Free, private, works offline.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ SITE HEADER ============ -->
+<header class="site-header">
+  <div class="header-inner">
+    <button class="brand" id="brandHomeBtn" type="button" aria-label="Go to home screen">
+      <span class="brand-mark" aria-hidden="true">M</span>
+      <span class="brand-name">MCQ Mock Test</span>
+    </button>
+    <span class="header-status" id="headerStatus" aria-live="polite"></span>
+  </div>
+</header>
+
+<main id="app" role="main">
+
+  <!-- ============ VIEW: HOME / TEST SELECTION ============ -->
+  <section id="view-home" class="view" hidden>
+
+    <div class="hero">
+      <p class="hero-eyebrow">Self-paced practice</p>
+      <h1 class="hero-title">MCQ Mock Test</h1>
+      <p class="hero-subtitle">Practice with 20 Mock Tests &bull; 2,000 Questions</p>
+      <p class="hero-desc">Each test is 100 questions, timed only by you. Answer, get instant feedback with a full explanation, and review anything you missed once you're done.</p>
+    </div>
+
+    <div class="section-block">
+      <div class="section-heading">
+        <h2>Choose a test</h2>
+        <p>Tests are unlocked in any order — pick up wherever you like.</p>
+      </div>
+      <div class="test-grid" id="testGrid" aria-label="Available mock tests"></div>
+    </div>
+
+    <div class="section-block" id="historySection">
+      <div class="section-heading">
+        <h2>My test history</h2>
+        <p>Saved privately in this browser only. Nothing leaves your device.</p>
+      </div>
+      <div id="historyWrap">
+        <p class="empty-note" id="historyEmpty">You haven't completed a test yet. Your results will show up here.</p>
+        <div class="history-table-wrap" id="historyTableWrap" hidden>
+          <table class="history-table" id="historyTable">
+            <thead>
+              <tr>
+                <th scope="col">Test</th>
+                <th scope="col">Date</th>
+                <th scope="col">Score</th>
+                <th scope="col">Percentage</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
+          </table>
+        </div>
+        <button class="btn btn-ghost btn-small" id="clearHistoryBtn" hidden type="button">Clear history</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ VIEW: LOADING ============ -->
+  <section id="view-loading" class="view" hidden>
+    <div class="loading-panel" role="status" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <p id="loadingText">Loading Mock Test&hellip;</p>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: ERROR ============ -->
+  <section id="view-error" class="view" hidden>
+    <div class="error-panel" role="alert">
+      <p class="error-badge">Unable to continue</p>
+      <p id="errorText">Unable to load this mock test. Please try again.</p>
+      <button class="btn btn-primary" id="errorBackBtn" type="button">Back to all tests</button>
+    </div>
+  </section>
+
+  <!-- ============ VIEW: QUIZ ============ -->
+  <section id="view-quiz" class="view" hidden>
+
+    <div class="quiz-topbar">
+      <div class="quiz-topbar-row">
+        <h1 id="quizTestName">Mock Test 1</h1>
+        <button class="btn btn-ghost btn-small" id="quitTestBtn" type="button">End test</button>
+      </div>
+      <div class="quiz-progress-row">
+        <span id="quizProgressLabel">Question 1 of 100</span>
+        <span id="quizProgressPercent">1% completed</span>
+      </div>
+      <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="1" id="progressBar" aria-label="Test progress">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <div class="quiz-tally">
+        <span class="tally-item tally-correct"><span id="tallyCorrect">0</span> correct</span>
+        <span class="tally-item tally-wrong"><span id="tallyWrong">0</span> wrong</span>
+      </div>
+    </div>
+
+    <div class="question-card">
+      <p class="question-label">Question</p>
+      <h2 class="question-text" id="questionText">Loading question&hellip;</h2>
+
+      <fieldset class="options-list" id="optionsList">
+        <legend class="sr-only">Answer choices</legend>
+        <!-- option rows injected by JS -->
+      </fieldset>
+
+      <div class="feedback-panel" id="feedbackPanel" hidden>
+        <p class="feedback-result" id="feedbackResult"></p>
+        <dl class="feedback-detail">
+          <div>
+            <dt>Your answer</dt>
+            <dd id="feedbackYourAnswer"></dd>
+          </div>
+          <div>
+            <dt>Correct answer</dt>
+            <dd id="feedbackCorrectAnswer"></dd>
+          </div>
+        </dl>
+        <div class="feedback-explanation">
+          <p class="feedback-explanation-label">Explanation</p>
+          <p id="feedbackExplanationText"></p>
+        </div>
+      </div>
+
+      <div class="quiz-actions">
+        <button class="btn btn-primary" id="submitAnswerBtn" type="button" disabled>Submit answer</button>
+        <button class="btn btn-primary" id="nextQuestionBtn" type="button" hidden>Next question</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ VIEW: RESULT ============ -->
+  <section id="view-result" class="view" hidden>
+
+    <div class="result-panel">
+      <p class="result-eyebrow" id="resultTestName">Mock Test 1</p>
+      <h1 class="result-title">Test completed</h1>
+
+      <div class="result-summary">
+        <div class="score-ring" id="scoreRing">
+          <span class="score-ring-value" id="scoreRingValue">78%</span>
+        </div>
+        <div class="result-stats">
+          <p class="result-message" id="resultMessage">Good!</p>
+          <p class="result-score-line"><span id="resultScoreFraction">78 / 100</span></p>
+          <dl class="result-stat-grid">
+            <div>
+              <dt>Total questions</dt>
+              <dd id="resultTotal">100</dd>
+            </div>
+            <div>
+              <dt>Correct answers</dt>
+              <dd id="resultCorrect">78</dd>
+            </div>
+            <div>
+              <dt>Wrong answers</dt>
+              <dd id="resultWrong">22</dd>
+            </div>
+            <div>
+              <dt>Percentage</dt>
+              <dd id="resultPercentage">78%</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <div class="result-actions">
+        <button class="btn btn-primary" id="retakeTestBtn" type="button">Retake test</button>
+        <button class="btn btn-secondary" id="backToTestsBtn" type="button">Back to all tests</button>
+        <button class="btn btn-ghost" id="reviewAnswersBtn" type="button">Review answers</button>
+      </div>
+    </div>
+
+    <!-- ============ REVIEW ANSWERS (within result view) ============ -->
+    <div class="review-panel" id="reviewPanel" hidden>
+      <div class="section-heading">
+        <h2>Review answers</h2>
+        <p>Tap any question to see your answer, the correct answer, and the explanation.</p>
+      </div>
+      <div class="review-list" id="reviewList"></div>
+    </div>
+
+  </section>
+
+</main>
+
+<!-- ============ REVIEW DETAIL MODAL ============ -->
+<div class="modal-overlay" id="reviewModalOverlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
+    <div class="modal-head">
+      <p class="modal-eyebrow" id="reviewModalEyebrow">Question 1</p>
+      <button class="modal-close" id="reviewModalClose" type="button" aria-label="Close review detail">&times;</button>
+    </div>
+    <h3 id="reviewModalTitle" class="modal-question"></h3>
+    <dl class="feedback-detail">
+      <div>
+        <dt>Your answer</dt>
+        <dd id="reviewModalYourAnswer"></dd>
+      </div>
+      <div>
+        <dt>Correct answer</dt>
+        <dd id="reviewModalCorrectAnswer"></dd>
+      </div>
+    </dl>
+    <div class="feedback-explanation">
+      <p class="feedback-explanation-label">Explanation</p>
+      <p id="reviewModalExplanation"></p>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p>Runs entirely in your browser. Questions and results never leave this device.</p>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
